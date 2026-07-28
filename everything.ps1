@@ -140,9 +140,6 @@ $script:CheatFeatureWords = @(
 )
 $script:AmbiguousFeatureWords = @("Fly", "Speed", "Velocity", "ESP", "Reach", "Freecam", "Hitboxes", "Refill", "AutoEat", "AutoSprint", "AntiAFK")
 
-# Multi-word / spaced or symbol-heavy signatures that don't fit the single-token
-# word-boundary regex used by Get-FeatureWordMatches. Matched with a plain
-# case-insensitive substring search instead (see Get-PhraseMatches).
 $script:CheatFeaturePhrases = @(
     "anchor macro", "auto anchor", "double anchor", "safe anchor",
     "auto crystal", "auto hit crystal", "auto totem", "inventory totem",
@@ -161,7 +158,6 @@ $script:CheatFeaturePhrases = @(
     "macro key", "no clip", "move freely through walls", "freeze player"
 )
 
-# Package / class-path style signatures seen in obfuscated or known cheat jars.
 $script:CheatPackagePatterns = @(
     'org\.chainlibs\.module\.impl\.modules',
     'meteordevelopment', 'cc[\\/\.]novoline', 'com[\\/\.]alan[\\/\.]clients',
@@ -173,7 +169,6 @@ $script:CheatPackagePatterns = @(
     'phantom-refmap\.json'
 )
 
-# Anti-debug / reflection-abuse indicators sometimes bundled with cheat clients.
 $script:SuspiciousApiPatterns = @(
     'JDWP\.VirtualMachine\.AllModules', 'jnativehook', 'JNativeHook',
     'GlobalScreen', 'NativeKeyListener', 'imgui\.gl3', 'imgui\.glfw',
@@ -239,9 +234,6 @@ function Test-IsKnownLegitTempModule {
     return $false
 }
 
-# Normalizes fullwidth unicode characters (a common obfuscation/evasion trick,
-# e.g. "ＡｕｔｏＣｒｙｓｔａｌ") back to their standard ASCII form so signature
-# matching still catches them.
 function Get-NormalizedText {
     param([string]$Text)
     if ([string]::IsNullOrEmpty($Text)) { return $Text }
@@ -1018,8 +1010,7 @@ function Invoke-HiddenModFilesPhase {
                 Extension = $item.Extension
             }
         }
-        # Single/short non-latin class names are a common obfuscation pattern
-        # used by some cheat client build pipelines to hinder decompilation.
+
         if ($item.Extension -eq ".class" -and $item.BaseName.Length -le 2 -and $item.BaseName -notmatch '^[A-Za-z0-9_$]+$') {
             $obfuscatedClassNames += $item.FullName
         }
@@ -1378,7 +1369,6 @@ function Invoke-AntiForensicsPhase {
 
     $antiForensicHits = 0
 
-    # --- Event log evidence of tampering / cover-up activity ---
     $eventChecks = @(
         @{ Log = "Application"; IDs = @(3079);       Label = "USN Journal deletion";        Severity = "MEDIUM" },
         @{ Log = "Security";    IDs = @(4616);       Label = "System time was changed";     Severity = "MEDIUM" },
@@ -1405,7 +1395,6 @@ function Invoke-AntiForensicsPhase {
         }
     }
 
-    # --- Recycle Bin activity for the current user ---
     try {
         $currentUserSID = [System.Security.Principal.WindowsIdentity]::GetCurrent().User.Value
         $recycleBinFolderPath = "C:\`$Recycle.Bin\$currentUserSID"
@@ -1428,7 +1417,6 @@ function Invoke-AntiForensicsPhase {
         Write-Host "   Unable to inspect Recycle Bin." -ForegroundColor DarkGray
     }
 
-    # --- Prefetch: enabled/disabled + hidden/read-only tampering ---
     try {
         $prefetchKeyPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters"
         $prefetchStatus = (Get-ItemProperty -Path $prefetchKeyPath -Name "EnablePrefetcher" -ErrorAction SilentlyContinue).EnablePrefetcher
@@ -1470,7 +1458,6 @@ function Invoke-AntiForensicsPhase {
         Write-Host "   Prefetch folder not found." -ForegroundColor DarkGray
     }
 
-    # --- Core Windows logging/telemetry services should be running ---
     $criticalServices = @(
         @{ Name = "DPS";        Label = "Diagnostic Policy Service" },
         @{ Name = "SysMain";    Label = "SysMain (Superfetch)" },
