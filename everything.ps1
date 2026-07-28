@@ -15,7 +15,7 @@ param(
 
 $script:Config = @{
     AppName        = "Vamp Cheat Scanner"
-    Version        = "5.0.0-combined"
+    Version        = "5.1.0-combined"
     DefaultModsPath = "$env:APPDATA\.minecraft\mods"
     TempDirName    = "vamp_cheatscanner_tmp"
     TotalPhases    = 12
@@ -83,7 +83,13 @@ $script:CheatClientNames = @(
     "onsetclient", "onset-client", "asyncclient", "async-client",
     "exhibitionclient", "exhibition-client", "expressionclient",
     "zephyrclient", "sanguine-client", "kaminari-client", "matrixclient",
-    "viperclient", "aionclient", "aresclient", "hyperionclient"
+    "viperclient", "aionclient", "aresclient", "hyperionclient",
+    "vapeclient", "vapelite", "intentclient", "novaclient", "novoclient",
+    "novoware", "pandaware", "moonclient", "astolfo", "konas", "inertia",
+    "exhibition", "azura", "skilled", "virginclient", "catleanclient",
+    "argonclient", "asteriaclient", "prestigeclient", "gypsyclient",
+    "xenonclient", "grimclient", "hellionclient", "hellion",
+    "dqrkisclient", "cheatbreaker", "moonsworth"
 )
 
 $script:CheatFeatureWords = @(
@@ -93,9 +99,86 @@ $script:CheatFeatureWords = @(
     "InventoryTotem", "LegitTotem", "AutoPot", "AutoArmor",
     "AutoDoubleHand", "JumpReset", "PingSpoof", "SelfDestruct",
     "ShieldBreaker", "WebMacro", "AxeSpam", "ChestStealer", "Xray",
-    "Nuker", "Freecam", "Fly", "Speed", "Velocity", "ESP", "Hitboxes"
+    "Nuker", "Freecam", "Fly", "Speed", "Velocity", "ESP", "Hitboxes",
+    "AutoHitCrystal", "ShieldDisabler", "SilentAim", "FakeLag", "FakeInv",
+    "FastXP", "FastExp", "AirAnchor", "SafeAnchor", "DoubleAnchor",
+    "AutoTPA", "BaseFinder", "AutoPotRefill", "KeyPearl", "AimBot",
+    "AutoNethPot", "AutoDtap", "AutoWeb", "AnchorAction", "MaceSwap",
+    "SpearSwap", "StunSlam", "BowAim", "Criticals", "Fakenick", "FakeItem",
+    "ItemExploit", "AuthBypass", "AutoEat", "AutoMine", "PopSwitch",
+    "SprintReset", "ChestSteal", "AntiBot", "ElytraSwap", "Refill",
+    "HoverTotem", "AutoFirework", "PackSpoof", "Antiknockback",
+    "AutoBreach", "NoBounce", "ClickAura", "MultiAura", "ForceField",
+    "LegitAura", "AutoAim", "AimLock", "HeadSnap", "CrystalAura",
+    "AnchorAura", "AnchorFill", "AnchorPlace", "BedAura", "AutoBed",
+    "BedBomb", "BedPlace", "BowAimbot", "BowSpam", "AutoBow", "AutoCrit",
+    "CritBypass", "AlwaysCrit", "ReachHack", "ExtendReach", "LongReach",
+    "HitboxExpand", "AntiKB", "NoKnockback", "VelocitySpoof", "KBReduce",
+    "OffhandTotem", "TotemSwitch", "AutoWeapon", "AutoSword", "AutoCity",
+    "Burrow", "SelfTrap", "HoleFiller", "AntiSurround", "AntiBurrow",
+    "WTap", "TargetStrafe", "AutoGap", "AutoPearl", "FlyHack",
+    "CreativeFlight", "BoatFly", "PacketFly", "AirJump", "SpeedHack",
+    "BunnyHop", "AntiFall", "NoFallDamage", "SafeFall", "StepHack",
+    "FastClimb", "AutoStep", "HighStep", "WaterWalk", "LiquidWalk",
+    "LavaWalk", "NoSlow", "NoSlowdown", "NoWeb", "NoSoulSand", "WallHack",
+    "ElytraSpeed", "InstantElytra", "ScaffoldWalk", "FastBridge",
+    "BuildHelper", "AutoBridge", "NukerLegit", "InstantBreak", "GhostHand",
+    "NoSwing", "PlaceAssist", "AirPlace", "AutoPlace", "InstantPlace",
+    "PlayerESP", "MobESP", "ItemESP", "StorageESP", "ChestESP", "Tracers",
+    "NameTagsHack", "XRayHack", "OreFinder", "CaveFinder", "OreESP",
+    "NewChunks", "ChunkBorders", "TunnelFinder", "TargetHUD",
+    "ReachDisplay", "DoubleClicker", "JitterClick", "ButterflyClick",
+    "CPSBoost", "InvManager", "InvMovebypass", "AutoSprint", "AntiAFK",
+    "AutoRespawn", "FakeLatency", "FakePing", "SpoofRotation",
+    "PositionSpoof", "GameSpeed", "SpeedTimer", "GrimBypass",
+    "VulcanBypass", "MatrixBypass", "AACBypass", "VerusDisabler",
+    "IntaveBypass", "WatchdogBypass", "PacketMine", "PacketWalk",
+    "PacketSneak", "PacketCancel", "PacketDupe", "PacketSpam",
+    "HideClient", "SessionStealer", "TokenLogger", "TokenGrabber",
+    "RemoteAccess", "ReverseShell", "Backdoor", "KeyLogger", "StashFinder",
+    "TrailFinder", "LootYeeter", "Blatant", "WalksyOptimizer"
 )
-$script:AmbiguousFeatureWords = @("Fly", "Speed", "Velocity", "ESP", "Reach", "Freecam", "Hitboxes")
+$script:AmbiguousFeatureWords = @("Fly", "Speed", "Velocity", "ESP", "Reach", "Freecam", "Hitboxes", "Refill", "AutoEat", "AutoSprint", "AntiAFK")
+
+# Multi-word / spaced or symbol-heavy signatures that don't fit the single-token
+# word-boundary regex used by Get-FeatureWordMatches. Matched with a plain
+# case-insensitive substring search instead (see Get-PhraseMatches).
+$script:CheatFeaturePhrases = @(
+    "anchor macro", "auto anchor", "double anchor", "safe anchor",
+    "auto crystal", "auto hit crystal", "auto totem", "inventory totem",
+    "hover totem", "auto pot", "auto pot refill", "auto armor",
+    "auto double hand", "shield disabler", "breaking shield with axe",
+    "auto mace", "mace swap", "spear swap", "stun slam", "axe spam",
+    "aim assist", "trigger bot", "silent rotations", "fake lag",
+    "fake punch", "web macro", "anti web", "auto web", "key pearl",
+    "loot yeeter", "fast place", "auto breach", "no bounce",
+    "place delay", "break delay", "place chance", "break chance",
+    "stop on kill", "trigger key", "switch delay", "totem slot",
+    "reach distance", "attack delay", "breach delay", "require elytra",
+    "auto switch back", "check line of sight", "only when falling",
+    "require crit", "predict damage", "predict crystals", "check aim",
+    "force totem", "auto inventory totem", "hit delay", "click simulation",
+    "macro key", "no clip", "move freely through walls", "freeze player"
+)
+
+# Package / class-path style signatures seen in obfuscated or known cheat jars.
+$script:CheatPackagePatterns = @(
+    'org\.chainlibs\.module\.impl\.modules',
+    'meteordevelopment', 'cc[\\/\.]novoline', 'com[\\/\.]alan[\\/\.]clients',
+    'club[\\/\.]maxstats', 'wtf[\\/\.]moonlight', 'me[\\/\.]zeroeightsix[\\/\.]kami',
+    'net[\\/\.]ccbluex', 'today[\\/\.]opai', 'org[\\/\.]chainlibs[\\/\.]module[\\/\.]impl[\\/\.]modules',
+    'xyz[\\/\.]greaj', 'com[\\/\.]cheatbreaker', 'com[\\/\.]moonsworth',
+    'dev[\\/\.]krypton', 'skid[\\/\.]krypton', 'dev\.gambleclient',
+    'dev\.virel', 'client-refmap\.json', 'cheat-refmap\.json',
+    'phantom-refmap\.json'
+)
+
+# Anti-debug / reflection-abuse indicators sometimes bundled with cheat clients.
+$script:SuspiciousApiPatterns = @(
+    'JDWP\.VirtualMachine\.AllModules', 'jnativehook', 'JNativeHook',
+    'GlobalScreen', 'NativeKeyListener', 'imgui\.gl3', 'imgui\.glfw',
+    'imgui\.binding', 'obfuscatedAuth', 'LicenseCheckMixin'
+)
 
 $script:KnownInjectorProcessNames = @(
     "injector", "loader64", "loader32", "dllinject", "xenos", "extreme-injector",
@@ -107,7 +190,8 @@ $script:KnownCheatFolders = @(
     ".sigma", ".aristois", ".rusherhack", ".salhack", ".kamiblue",
     ".novoline", ".flux", ".liquidbounce", ".wolfram", ".doomsday",
     ".prestige", ".ghost", ".ghostclient", ".rise", ".onset", ".async",
-    ".exhibition", ".expression"
+    ".exhibition", ".expression", ".vape", ".novaclient", ".catlean",
+    ".argon", ".asteria", ".gypsy", ".xenon", ".grim", ".hellion"
 )
 $script:MacroToolProcessNames = @(
     "autohotkeyu64", "autohotkeyu32", "autohotkey", "ahktray",
@@ -155,33 +239,91 @@ function Test-IsKnownLegitTempModule {
     return $false
 }
 
+# Normalizes fullwidth unicode characters (a common obfuscation/evasion trick,
+# e.g. "ＡｕｔｏＣｒｙｓｔａｌ") back to their standard ASCII form so signature
+# matching still catches them.
+function Get-NormalizedText {
+    param([string]$Text)
+    if ([string]::IsNullOrEmpty($Text)) { return $Text }
+    $sb = New-Object System.Text.StringBuilder($Text.Length)
+    foreach ($ch in $Text.ToCharArray()) {
+        $code = [int]$ch
+        if ($code -ge 0xFF01 -and $code -le 0xFF5E) {
+            [void]$sb.Append([char]($code - 0xFEE0))
+        } elseif ($code -eq 0x3000) {
+            [void]$sb.Append(' ')
+        } else {
+            [void]$sb.Append($ch)
+        }
+    }
+    return $sb.ToString()
+}
+
 function Get-ClientNameMatches {
     param([string]$Text)
+    $normalized = Get-NormalizedText -Text $Text
     $found = [System.Collections.Generic.List[string]]::new()
     foreach ($name in $script:CheatClientNames) {
-        if ($Text -match [regex]::Escape($name)) { $found.Add($name) }
+        if ($normalized -match [regex]::Escape($name)) { $found.Add($name) }
     }
     return $found
 }
 
 function Get-FeatureWordMatches {
     param([string]$Text)
+    $normalized = Get-NormalizedText -Text $Text
     $found = [System.Collections.Generic.List[string]]::new()
     foreach ($word in $script:CheatFeatureWords) {
         $pattern = "(?<![A-Za-z])" + [regex]::Escape($word) + "(?![a-z])"
-        if ([regex]::IsMatch($Text, $pattern)) { $found.Add($word) }
+        if ([regex]::IsMatch($normalized, $pattern)) { $found.Add($word) }
+    }
+    return $found
+}
+
+function Get-PhraseMatches {
+    param([string]$Text)
+    $normalized = Get-NormalizedText -Text $Text
+    $found = [System.Collections.Generic.List[string]]::new()
+    foreach ($phrase in $script:CheatFeaturePhrases) {
+        if ($normalized.IndexOf($phrase, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) { $found.Add($phrase) }
+    }
+    return $found
+}
+
+function Get-PackageMatches {
+    param([string]$Text)
+    $found = [System.Collections.Generic.List[string]]::new()
+    foreach ($pattern in $script:CheatPackagePatterns) {
+        if ([regex]::IsMatch($Text, $pattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)) { $found.Add($pattern) }
+    }
+    return $found
+}
+
+function Get-ApiPatternMatches {
+    param([string]$Text)
+    $found = [System.Collections.Generic.List[string]]::new()
+    foreach ($pattern in $script:SuspiciousApiPatterns) {
+        if ([regex]::IsMatch($Text, $pattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)) { $found.Add($pattern) }
     }
     return $found
 }
 
 function Get-SignatureRisk {
-    param([string[]]$ClientHits, [string[]]$FeatureHits)
+    param([string[]]$ClientHits, [string[]]$FeatureHits, [string[]]$PhraseHits, [string[]]$PackageHits, [string[]]$ApiHits)
     if ($ClientHits -and $ClientHits.Count -gt 0) { return "HIGH" }
-    if (-not $FeatureHits -or $FeatureHits.Count -eq 0) { return $null }
+    if ($PackageHits -and $PackageHits.Count -gt 0) { return "HIGH" }
+
     $nonAmbiguous = @($FeatureHits | Where-Object { $script:AmbiguousFeatureWords -notcontains $_ })
     $ambiguousOnly = @($FeatureHits | Where-Object { $script:AmbiguousFeatureWords -contains $_ })
+    $phraseCount = if ($PhraseHits) { $PhraseHits.Count } else { 0 }
+    $apiCount = if ($ApiHits) { $ApiHits.Count } else { 0 }
+
     if ($nonAmbiguous.Count -ge 2) { return "HIGH" }
+    if ($phraseCount -ge 2) { return "HIGH" }
+    if ($nonAmbiguous.Count -ge 1 -and $phraseCount -ge 1) { return "HIGH" }
     if ($nonAmbiguous.Count -ge 1) { return "MEDIUM" }
+    if ($phraseCount -ge 1) { return "MEDIUM" }
+    if ($apiCount -ge 1) { return "MEDIUM" }
     if ($ambiguousOnly.Count -ge 3) { return "MEDIUM" }
     return $null
 }
@@ -189,7 +331,16 @@ function Get-SignatureRisk {
 $script:MemorySearchTerms = @(
     "Autototem", "Auto crystal", "Cw crystal", "Anchor macro", "Anchormacro",
     "Auto anchor", "TriggerBot", "AutoDhand", "SlientAim", "AutoInventoryTotem",
-    "aimassist", "AutoCrystal", "prestige", "argon", "stop_cracking", "self de"
+    "aimassist", "AutoCrystal", "prestige", "argon", "stop_cracking", "self de",
+    "AutoHitCrystal", "AutoPot", "AutoArmor", "InventoryTotem", "LegitTotem",
+    "PingSpoof", "SelfDestruct", "ShieldBreaker", "ShieldDisabler", "AxeSpam",
+    "WebMacro", "AntiWeb", "AutoWeb", "FastPlace", "AutoBreach", "DoubleAnchor",
+    "SafeAnchor", "AirAnchor", "MaceSwap", "SpearSwap", "StunSlam", "KeyPearl",
+    "LootYeeter", "FakeLag", "FakePunch", "FakeInv", "SilentRotations",
+    "WalksyOptimizer", "WalskyOptimizer", "donut", "gypsy", "xenon", "asteria",
+    "catlean", "dqrkis", "hellion", "obfuscatedAuth", "LicenseCheckMixin",
+    "JDWP.VirtualMachine.AllModules", "auto_neth_pot", "auto_dtap", "trigger_bot",
+    "auto_web", "mace_swap", "stun_slam", "safe_anchor", "double_anchor"
 )
 $script:MemoryMinStringLength = 4
 
@@ -512,6 +663,7 @@ function Write-Banner {
     Write-DoubleBoxLine -Text ("Version         : {0}" -f $script:Config.Version) -Color Gray
     Write-DoubleBoxLine -Text ("Scan started     : {0}" -f (Get-Date)) -Color Gray
     Write-DoubleBoxLine -Text ("Execution mode   : 100% local, no remote code ever run") -Color Cyan
+    Write-DoubleBoxLine -Text ("Signature counts : {0} clients / {1} features / {2} phrases" -f $script:CheatClientNames.Count, $script:CheatFeatureWords.Count, $script:CheatFeaturePhrases.Count) -Color Cyan
     Write-DoubleBoxDivider
     Write-DoubleBoxLine -Text ("Severity legend  :  [X] HIGH    [!] MEDIUM    [i] INFO") -Color Gray
     Write-DoubleBoxDivider
@@ -741,12 +893,16 @@ function Invoke-JarParserPhase {
 
 function Test-CheatSignaturesInFile {
     param([string]$FilePath)
-    $result = @{ ClientHits = @(); FeatureHits = @() }
+    $result = @{ ClientHits = @(); FeatureHits = @(); PhraseHits = @(); PackageHits = @(); ApiHits = @() }
     try {
         $bytes = [System.IO.File]::ReadAllBytes($FilePath)
         $content = [System.Text.Encoding]::ASCII.GetString($bytes)
+        $utf8Content = [System.Text.Encoding]::UTF8.GetString($bytes)
         $result.ClientHits  = @(Get-ClientNameMatches -Text $content)
         $result.FeatureHits = @(Get-FeatureWordMatches -Text $content)
+        $result.PhraseHits  = @(Get-PhraseMatches -Text $utf8Content)
+        $result.PackageHits = @(Get-PackageMatches -Text $content)
+        $result.ApiHits     = @(Get-ApiPatternMatches -Text $content)
     } catch { }
     return $result
 }
@@ -767,8 +923,8 @@ function Test-EmbeddedJars {
         if (Test-Path $embeddedPath) {
             Get-ChildItem -Path $embeddedPath -Filter *.jar -ErrorAction SilentlyContinue | ForEach-Object {
                 $sig = Test-CheatSignaturesInFile -FilePath $_.FullName
-                $risk = Get-SignatureRisk -ClientHits $sig.ClientHits -FeatureHits $sig.FeatureHits
-                if ($risk) { $threats += @{ EmbeddedJar = $_.Name; ClientHits = $sig.ClientHits; FeatureHits = $sig.FeatureHits; Risk = $risk } }
+                $risk = Get-SignatureRisk -ClientHits $sig.ClientHits -FeatureHits $sig.FeatureHits -PhraseHits $sig.PhraseHits -PackageHits $sig.PackageHits -ApiHits $sig.ApiHits
+                if ($risk) { $threats += @{ EmbeddedJar = $_.Name; ClientHits = $sig.ClientHits; FeatureHits = $sig.FeatureHits; PhraseHits = $sig.PhraseHits; PackageHits = $sig.PackageHits; Risk = $risk } }
             }
         }
         Remove-Item -Recurse -Force $extractPath -ErrorAction SilentlyContinue
@@ -796,7 +952,7 @@ function Invoke-DeepThreatScanPhase {
         Write-ProgressBar -Message "Scanning" -Progress $i -Total $UnknownMods.Count
         $sig = Test-CheatSignaturesInFile -FilePath $mod.FilePath
         $embedded = @(Test-EmbeddedJars -JarPath $mod.FilePath -TempDir $tempDir)
-        $risk = Get-SignatureRisk -ClientHits $sig.ClientHits -FeatureHits $sig.FeatureHits
+        $risk = Get-SignatureRisk -ClientHits $sig.ClientHits -FeatureHits $sig.FeatureHits -PhraseHits $sig.PhraseHits -PackageHits $sig.PackageHits -ApiHits $sig.ApiHits
 
         if ($risk -or $embedded.Count -gt 0) {
             $finalRisk = if ($embedded.Count -gt 0 -and (-not $risk -or $risk -eq "MEDIUM")) { "HIGH" } else { $risk }
@@ -805,6 +961,9 @@ function Invoke-DeepThreatScanPhase {
                 FilePath    = $mod.FilePath
                 ClientHits  = $sig.ClientHits
                 FeatureHits = $sig.FeatureHits
+                PhraseHits  = $sig.PhraseHits
+                PackageHits = $sig.PackageHits
+                ApiHits     = $sig.ApiHits
                 Embedded    = $embedded
                 Risk        = $finalRisk
             }
@@ -820,11 +979,15 @@ function Invoke-DeepThreatScanPhase {
             $parts = @()
             if ($t.ClientHits.Count -gt 0)  { $parts += ("known client name(s): {0}" -f ($t.ClientHits -join ", ")) }
             if ($t.FeatureHits.Count -gt 0) { $parts += ("cheat-module strings: {0}" -f ($t.FeatureHits -join ", ")) }
+            if ($t.PhraseHits.Count -gt 0)  { $parts += ("cheat-phrase strings: {0}" -f ($t.PhraseHits -join ", ")) }
+            if ($t.PackageHits.Count -gt 0) { $parts += ("known cheat package path(s)") }
+            if ($t.ApiHits.Count -gt 0)     { $parts += ("suspicious API/anti-debug usage") }
             Add-Finding $t.Risk "JarThreatScan" ("'{0}' matched {1}" -f $t.FileName, ($parts -join "; "))
             foreach ($e in $t.Embedded) {
                 $eparts = @()
                 if ($e.ClientHits.Count -gt 0)  { $eparts += ("known client name(s): {0}" -f ($e.ClientHits -join ", ")) }
                 if ($e.FeatureHits.Count -gt 0) { $eparts += ("cheat-module strings: {0}" -f ($e.FeatureHits -join ", ")) }
+                if ($e.PhraseHits.Count -gt 0)  { $eparts += ("cheat-phrase strings: {0}" -f ($e.PhraseHits -join ", ")) }
                 Add-Finding "HIGH" "JarThreatScan" ("'{0}' has embedded jar '{1}' matching {2}" -f $t.FileName, $e.EmbeddedJar, ($eparts -join "; "))
             }
         }
@@ -843,6 +1006,7 @@ function Invoke-HiddenModFilesPhase {
 
     $files = Get-ChildItem -Path $ModsPath -Recurse -Force -ErrorAction SilentlyContinue
     $suspicious = @()
+    $obfuscatedClassNames = @()
     foreach ($item in $files) {
         $hidden = $item.Attributes -band [System.IO.FileAttributes]::Hidden
         $system = $item.Attributes -band [System.IO.FileAttributes]::System
@@ -853,6 +1017,11 @@ function Invoke-HiddenModFilesPhase {
                 System = $system
                 Extension = $item.Extension
             }
+        }
+        # Single/short non-latin class names are a common obfuscation pattern
+        # used by some cheat client build pipelines to hinder decompilation.
+        if ($item.Extension -eq ".class" -and $item.BaseName.Length -le 2 -and $item.BaseName -notmatch '^[A-Za-z0-9_$]+$') {
+            $obfuscatedClassNames += $item.FullName
         }
     }
 
@@ -867,6 +1036,11 @@ function Invoke-HiddenModFilesPhase {
         Add-Finding "MEDIUM" "HiddenFiles" ("Found $($suspicious.Count) hidden/system file(s) in mods folder")
     } else {
         Write-Host "   No hidden or system files detected in mods folder." -ForegroundColor Green
+    }
+
+    if ($obfuscatedClassNames.Count -ge 5) {
+        Write-Host ("   {0} unusually short/non-latin .class file name(s) found (possible obfuscation)" -f $obfuscatedClassNames.Count) -ForegroundColor Yellow
+        Add-Finding "INFO" "HiddenFiles" ("$($obfuscatedClassNames.Count) short non-latin .class file name(s) found - can indicate obfuscated code, though many legit mod loaders also do this")
     }
 }
 
@@ -1404,11 +1578,15 @@ function Build-HtmlReport {
             $badgeClass = if ($t.Risk -eq "HIGH") { "badge-flagged" } else { "badge-medium" }
             $clientHits = if ($t.ClientHits.Count -gt 0) { "<div class='detail-line'><b>Known client match:</b> $(HtmlEncode ($t.ClientHits -join ', '))</div>" } else { "" }
             $featureHits = if ($t.FeatureHits.Count -gt 0) { "<div class='detail-line'><b>Cheat-module strings:</b> $(HtmlEncode ($t.FeatureHits -join ', '))</div>" } else { "" }
+            $phraseHits = if ($t.PhraseHits.Count -gt 0) { "<div class='detail-line'><b>Cheat-phrase strings:</b> $(HtmlEncode ($t.PhraseHits -join ', '))</div>" } else { "" }
+            $packageHits = if ($t.PackageHits.Count -gt 0) { "<div class='detail-line'><b>Known cheat package path detected</b></div>" } else { "" }
+            $apiHits = if ($t.ApiHits.Count -gt 0) { "<div class='detail-line'><b>Suspicious API / anti-debug usage detected</b></div>" } else { "" }
             $embeddedHtml = ""
             foreach ($e in $t.Embedded) {
                 $eparts = @()
                 if ($e.ClientHits.Count -gt 0) { $eparts += ($e.ClientHits -join ", ") }
                 if ($e.FeatureHits.Count -gt 0) { $eparts += ($e.FeatureHits -join ", ") }
+                if ($e.PhraseHits.Count -gt 0) { $eparts += ($e.PhraseHits -join ", ") }
                 $embeddedHtml += "<div class='detail-line'><b>Embedded jar '$(HtmlEncode $e.EmbeddedJar)':</b> $(HtmlEncode ($eparts -join '; '))</div>"
             }
             $rows += @"
@@ -1420,6 +1598,9 @@ function Build-HtmlReport {
           <div class="detail-line mono">$(HtmlEncode $t.FilePath)</div>
           $clientHits
           $featureHits
+          $phraseHits
+          $packageHits
+          $apiHits
           $embeddedHtml
         </div>
 "@
